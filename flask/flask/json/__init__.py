@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import io
 import uuid
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from flask.globals import current_app, request
 from flask._compat import text_type, PY2
 
@@ -64,7 +64,8 @@ class JSONEncoder(_json.JSONEncoder):
         """
         if isinstance(o, date):
             if isinstance(o, datetime) and o.tzinfo:
-                return http_date(o.utctimetuple())
+                utc_dt = o.astimezone(timezone.utc)
+                return http_date(utc_dt.utctimetuple())
             return http_date(o.timetuple())
         if isinstance(o, uuid.UUID):
             return str(o)

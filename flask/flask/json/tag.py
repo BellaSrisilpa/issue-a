@@ -40,7 +40,7 @@ processes dicts first, so insert the new tag at the front of the order since
 """
 
 from base64 import b64decode, b64encode
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from jinja2 import Markup
@@ -203,6 +203,10 @@ class TagDateTime(JSONTag):
         return isinstance(value, datetime)
 
     def to_json(self, value):
+        # Ensure timezone-aware datetimes are converted to UTC before
+        # formatting so the output always represents the UTC instant.
+        if isinstance(value, datetime) and value.tzinfo:
+            value = value.astimezone(timezone.utc)
         return http_date(value)
 
     def to_python(self, value):
