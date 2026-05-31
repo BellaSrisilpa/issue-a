@@ -9,7 +9,7 @@ def test_timezone_aware_datetime_serializes_with_utc_offset(app):
     act_dt = datetime(2017, 1, 1, 12, 0, 0, tzinfo=tz_sydney)
 
     with app.app_context():
-        act_res_http = app.json.dumps(act_dt)
+        act_res_http = flask.json.dumps(act_dt)
         act_res = email.utils.parsedate_to_datetime(act_res_http)
     
     exp_dt = datetime(2017, 1, 1, 2, 0, 0)
