@@ -1,3 +1,22 @@
+# JSONEncoder.default() previously called o.timetuple() for all date/datetime
+# objects, which strips timezone information. For timezone-aware datetimes this
+# caused http_date() to treat the local time as UTC, producing a wrong offset.
+
+# When o is a datetime with tzinfo set, call o.astimezone(timezone.utc) to
+# convert to UTC first, then pass the datetime object directly to http_date()
+# instead of a struct_time.
+
+# Files changed:
+# flask/json/__init__.py             - JSONEncoder.default() aware-datetime branch
+# tests/test_json_datetime_issue.py  - new regression test for the fix
+
+# Verification:
+# Construct a Sydney-time datetime (+10:00) and assert that its JSON
+# serialization equals that of the equivalent naive UTC datetime
+# (2017-01-01 02:00:00). Before the fix the two values differed because the
+# aware datetime was serialised as 12:00:00+00:00 instead of 02:00:00+00:00.
+# pytest tests/test_json_datetime_issue.py  → 1 passed
+
 diff --git a/flask/.gitignore b/flask/.gitignore
 index fb9baf3..3ff3d80 100644
 --- a/flask/.gitignore
