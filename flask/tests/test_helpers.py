@@ -177,6 +177,17 @@ class TestJSON(object):
             assert rv.mimetype == 'application/json'
             assert flask.json.loads(rv.data)['x'] == http_date(d.timetuple())
 
+    def test_jsonify_aware_datetimes(self, app, client):
+        """Timezone-aware datetimes are converted to UTC before encoding."""
+        tz = datetime.timezone(datetime.timedelta(hours=10))
+        aware = datetime.datetime(2017, 1, 1, 12, 0, 0, tzinfo=tz)
+        url = '/aware_datetest'
+        app.add_url_rule(url, url, lambda: flask.jsonify(x=aware))
+        rv = client.get(url)
+        assert rv.mimetype == 'application/json'
+        assert flask.json.loads(rv.data)['x'] == http_date(
+            aware.astimezone(datetime.timezone.utc))
+
     def test_jsonify_uuid_types(self, app, client):
         """Test jsonify with uuid.UUID types"""
 

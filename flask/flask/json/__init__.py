@@ -64,8 +64,7 @@ class JSONEncoder(_json.JSONEncoder):
         """
         if isinstance(o, date):
             if isinstance(o, datetime) and o.tzinfo:
-                utc_dt = o.astimezone(timezone.utc)
-                return http_date(utc_dt.utctimetuple())
+                return http_date(o.astimezone(timezone.utc))
             return http_date(o.timetuple())
         if isinstance(o, uuid.UUID):
             return str(o)
